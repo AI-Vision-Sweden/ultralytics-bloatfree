@@ -92,7 +92,10 @@ dev = [
 export = [
     "numpy<2.0.0", # TF 2.20 compatibility
     "onnx>=1.12.0; platform_system != 'Darwin'", # ONNX export
+    "onnxruntime>=1.12.0; platform_system != 'Darwin'", # ONNX inference
     "onnx>=1.12.0,<1.18.0; platform_system == 'Darwin'",  # TF inference hanging on MacOS
+    "onnxruntime>=1.12.0,<1.18.0; platform_system == 'Darwin'",  # ONNX inference for MacOS
+    
     "scikit-learn>=1.3.2; platform_system != 'Windows' and python_version <= '3.13'", # CoreML k-means quantization
     "h5py!=3.11.0; platform_machine == 'aarch64'", # fix h5py build issues due to missing aarch64 wheels in 3.11 release
 ]
@@ -145,7 +148,7 @@ addopts = "--doctest-modules --durations=30 --color=yes"
 markers = [
     "slow: skip slow tests unless --slow is set",
 ]
-norecursedirs = [".git", "dist", "build"]
+norecursedirs = [".git", "dist", "build", "examples"]
 
 [tool.coverage.run]
 source = ["ultralytics/"]
