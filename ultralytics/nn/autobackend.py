@@ -20,8 +20,7 @@ from ultralytics.utils.nms import non_max_suppression
 
 
 def check_class_names(names: list | dict) -> dict[int, str]:
-    """
-    Check class names and convert to dict format if needed.
+    """Check class names and convert to dict format if needed.
 
     Args:
         names (list | dict): Class names as list or dict format.
@@ -50,8 +49,7 @@ def check_class_names(names: list | dict) -> dict[int, str]:
 
 
 def default_class_names(data: str | Path | None = None) -> dict[int, str]:
-    """
-    Apply default class names to an input YAML file or return numerical class names.
+    """Apply default class names to an input YAML file or return numerical class names.
 
     Args:
         data (str | Path, optional): Path to YAML file containing class names.
@@ -68,8 +66,7 @@ def default_class_names(data: str | Path | None = None) -> dict[int, str]:
 
 
 class AutoBackend(nn.Module):
-    """
-    Handle dynamic backend selection for running inference using Ultralytics YOLO models.
+    """Handle dynamic backend selection for running inference using Ultralytics YOLO models.
 
     The AutoBackend class abstracts supported inference engines.
 
@@ -116,8 +113,7 @@ class AutoBackend(nn.Module):
         fuse: bool = True,
         verbose: bool = True,
     ):
-        """
-        Initialize the AutoBackend for inference.
+        """Initialize the AutoBackend for inference.
 
         Args:
             model (str | torch.nn.Module): Path to the model weights file or a module instance.
@@ -342,8 +338,7 @@ class AutoBackend(nn.Module):
         embed: list | None = None,
         **kwargs: Any,
     ) -> torch.Tensor | list[torch.Tensor]:
-        """
-        Run inference on an AutoBackend model.
+        """Run inference on an AutoBackend model.
 
         Args:
             im (torch.Tensor): The image tensor to perform inference on.
@@ -424,8 +419,7 @@ class AutoBackend(nn.Module):
             return self.from_numpy(y)
 
     def from_numpy(self, x: np.ndarray) -> torch.Tensor:
-        """
-        Convert a numpy array to a tensor.
+        """Convert a numpy array to a tensor.
 
         Args:
             x (np.ndarray): The array to be converted.
@@ -436,8 +430,7 @@ class AutoBackend(nn.Module):
         return torch.tensor(x).to(self.device) if isinstance(x, np.ndarray) else x
 
     def warmup(self, imgsz: tuple[int, int, int, int] = (1, 3, 640, 640)) -> None:
-        """
-        Warm up the model by running one forward pass with a dummy input.
+        """Warm up the model by running one forward pass with a dummy input.
 
         Args:
             imgsz (tuple): The shape of the dummy input tensor in the format (batch_size, channels, height, width)

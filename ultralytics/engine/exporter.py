@@ -76,9 +76,17 @@ from ultralytics.utils.checks import (
     is_intel,
     is_sudo_available,
 )
-from ultralytics.utils.downloads import attempt_download_asset, get_github_assets, safe_download
-from ultralytics.utils.export import onnx2engine, torch2imx, torch2onnx
-from ultralytics.utils.files import file_size, spaces_in_path
+from ultralytics.utils.downloads import get_github_assets, safe_download
+from ultralytics.utils.export import (
+    keras2pb,
+    onnx2engine,
+    onnx2saved_model,
+    pb2tfjs,
+    tflite2edgetpu,
+    torch2imx,
+    torch2onnx,
+)
+from ultralytics.utils.files import file_size
 from ultralytics.utils.metrics import batch_probiou
 from ultralytics.utils.nms import TorchNMS
 from ultralytics.utils.ops import Profile
@@ -140,8 +148,7 @@ def best_onnx_opset(onnx, cuda=False) -> int:
 
 
 def validate_args(format, passed_args, valid_args):
-    """
-    Validate arguments based on the export format.
+    """Validate arguments based on the export format.
 
     Args:
         format (str): The export format.
@@ -186,8 +193,7 @@ def try_export(inner_func):
 
 
 class Exporter:
-    """
-    A class for exporting YOLO models to various formats.
+    """A class for exporting YOLO models to various formats.
 
     This class provides functionality to export YOLO models to different formats including ONNX, TensorRT,
     and others. It handles format validation, device selection, model preparation, and the actual export
@@ -225,8 +231,7 @@ class Exporter:
     """
 
     def __init__(self, cfg=DEFAULT_CFG, overrides=None, _callbacks=None):
-        """
-        Initialize the Exporter class.
+        """Initialize the Exporter class.
 
         Args:
             cfg (str, optional): Path to a configuration file.
@@ -484,7 +489,7 @@ class Exporter:
             assert TORCH_1_13, f"'nms=True' ONNX export requires torch>=1.13 (found torch=={TORCH_VERSION})"
 
         f = str(self.file.with_suffix(".onnx"))
-        output_names = ["output0", "output1"] if isinstance(self.model, SegmentationModel) else ["output0"]
+        output_names = ["output0", "output1"] if self.model.task == "segment" else ["output0"]
         dynamic = self.args.dynamic
         if dynamic:
             dynamic = {"images": {0: "batch", 2: "height", 3: "width"}}  # shape(1,3,640,640)
@@ -587,8 +592,7 @@ class NMSModel(torch.nn.Module):
     """Model wrapper with embedded NMS for Detect, Segment, Pose and OBB."""
 
     def __init__(self, model, args):
-        """
-        Initialize the NMSModel.
+        """Initialize the NMSModel.
 
         Args:
             model (torch.nn.Module): The model to wrap with NMS postprocessing.
@@ -601,15 +605,14 @@ class NMSModel(torch.nn.Module):
         self.is_tf = False # No TensorFlow support
 
     def forward(self, x):
-        """
-        Perform inference with NMS post-processing. Supports Detect, Segment, OBB and Pose.
+        """Perform inference with NMS post-processing. Supports Detect, Segment, OBB and Pose.
 
         Args:
             x (torch.Tensor): The preprocessed tensor with shape (N, 3, H, W).
 
         Returns:
-            (torch.Tensor): List of detections, each an (N, max_det, 4 + 2 + extra_shape) Tensor where N is the
-                number of detections after NMS.
+            (torch.Tensor): List of detections, each an (N, max_det, 4 + 2 + extra_shape) Tensor where N is the number
+                of detections after NMS.
         """
         from functools import partial
 
